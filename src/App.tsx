@@ -3,18 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, FormEvent } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { Shield, TrendingUp, Heart, MessageCircle, Download, Globe } from 'lucide-react';
+import { LeadCaptureOverlay } from './components/LeadCaptureOverlay';
 import { supabase } from './supabaseClient';
 
 const translations = {
   es: {
-    ov_title: "Atención Exclusiva",
-    ov_subtitle: "Deja tus datos para proteger a tu familia.",
+    ov_title: "Accede a material exclusivo",
+    ov_subtitle: "Hay un video especial para ti",
     ov_name_placeholder: "Nombre completo",
     ov_phone_placeholder: "Teléfono",
-    ov_btn: "Ver el Video Ahora",
+    ov_btn: "Acceder",
     hero_pre: "Asesoría exclusiva.",
     hero_title: "Asesoria directa con Juan C. Franco totalmente gratuita por tiempo limitado.",
     video_placeholder: "Video de Juan Franco",
@@ -62,9 +63,6 @@ const translations = {
 export default function App() {
   const [lang, setLang] = useState<'es' | 'en'>('es');
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
 
   const t = translations[lang];
 
@@ -76,75 +74,16 @@ export default function App() {
     }
   }, [submitted]);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
 
-    const { data, error, status } = await supabase.from('leads').insert([{ name, phone }]);
-    console.log("Respuesta Supabase:", data, error);
-
-    if (!error || status === 201) {
-      setSubmitted(true);
-      document.body.classList.remove('overflow-hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      console.error("Error devuelto por Supabase al insertar lead:", error);
-      alert(`Error Supabase: ${error?.message || JSON.stringify(error) || t.error_msg}`);
-    }
-    setLoading(false);
-  };
 
   const toggleLang = () => setLang(prev => (prev === 'es' ? 'en' : 'es'));
 
   return (
     <div className="min-h-screen bg-white selection:bg-brand/20">
       {/* Lead Magnet Overlay */}
-      <AnimatePresence>
-        {!submitted && (
-          <motion.div
-            id="overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="bg-[#F8FAFC] max-w-md w-full p-8 md:p-10 shadow-2xl rounded-sm text-center border-t-4 border-[#417232]"
-            >
-              <h2 className="text-2xl mb-2 font-serif text-black">{t.ov_title}</h2>
-              <p className="text-gray-500 mb-8 text-sm">{t.ov_subtitle}</p>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <input
-                  type="text"
-                  required
-                  placeholder={t.ov_name_placeholder}
-                  className="w-full p-3 bg-white border border-gray-200 focus:outline-none focus:border-[#417232] rounded-sm transition-colors text-black"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                />
-                <input
-                  type="tel"
-                  required
-                  placeholder={t.ov_phone_placeholder}
-                  className="w-full p-3 bg-white border border-gray-200 focus:outline-none focus:border-[#417232] rounded-sm transition-colors text-black"
-                  value={phone}
-                  onChange={e => setPhone(e.target.value)}
-                />
-                <button
-                  type="submit"
-                  disabled={loading || !name || !phone}
-                  className="w-full bg-[#417232] text-white py-4 font-bold tracking-widest uppercase text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:bg-opacity-90 active:scale-95 btn-animate"
-                >
-                  {loading ? 'Cargando...' : t.ov_btn}
-                </button>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {!submitted && (
+        <LeadCaptureOverlay t={t} onSuccess={() => setSubmitted(true)} />
+      )}
 
       {/* Header */}
       <header className="fixed top-0 w-full bg-white/90 backdrop-blur-md z-40 border-b border-gray-100">
@@ -185,8 +124,8 @@ export default function App() {
           </motion.h1>
 
           <div className="aspect-video bg-gray-100 w-full mb-10 border border-gray-200 relative overflow-hidden">
-             <video
-               src="videofrancocomp.mp4"
+            <video
+              src="videofrancocomp.mp4"
               controls
               playsInline
               className="w-full h-full object-cover"
@@ -207,9 +146,9 @@ export default function App() {
             rel="noopener noreferrer"
             className="flex flex-col items-center border border-brand p-8 text-brand text-center btn-animate group transition-all hover:shadow-xl hover:bg-gray-50"
           >
-            <img 
-              src="ebookes.jpeg" 
-              alt="El Escudo de un Millón de Dólares - Portada" 
+            <img
+              src="ebookes.jpeg"
+              alt="El Escudo de un Millón de Dólares - Portada"
               className="w-full max-w-[240px] h-auto object-contain mb-6 rounded-sm shadow-md transition-transform group-hover:scale-105"
             />
             <div className="flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-wider">
@@ -224,9 +163,9 @@ export default function App() {
             rel="noopener noreferrer"
             className="flex flex-col items-center border border-brand p-8 text-brand text-center btn-animate group transition-all hover:shadow-xl hover:bg-gray-50"
           >
-            <img 
-              src="ebooken.jpeg" 
-              alt="The Million Dollar Shield - Cover" 
+            <img
+              src="ebooken.jpeg"
+              alt="The Million Dollar Shield - Cover"
               className="w-full max-w-[240px] h-auto object-contain mb-6 rounded-sm shadow-md transition-transform group-hover:scale-105"
             />
             <div className="flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-wider">
