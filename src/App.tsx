@@ -157,7 +157,7 @@ export default function App() {
             </div>
           </a>
           <a
-            href="the-milllion-dollar-shield.pdf"
+            href="the-million-dollar-shield.pdf"
             download
             target="_blank"
             rel="noopener noreferrer"
