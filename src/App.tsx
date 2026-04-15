@@ -140,7 +140,7 @@ export default function App() {
         {/* E-books Section */}
         <section className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 mb-24">
           <a
-            href="el-escudo-de-un-millon-de-dolares-Juan-C-Franco-Español.pdf"
+            href="el-escudo-de-un-millon-de-dolares-Juan-C-Franco-Espanol.pdf"
             download
             target="_blank"
             rel="noopener noreferrer"
