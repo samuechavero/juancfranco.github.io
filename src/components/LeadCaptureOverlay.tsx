@@ -46,6 +46,9 @@ export function LeadCaptureOverlay({ t, onSuccess }: LeadCaptureOverlayProps) {
     }]);
 
     if (!error) {
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq('track', 'Lead');
+      }
       onSuccess();
     } else {
       alert(t.error_msg);
